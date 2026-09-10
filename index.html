@@ -225,6 +225,28 @@
   .catrow-line{display:flex;align-items:center;gap:8px}
   .catrow-line input{flex:1}
 
+  /* 滚轮选择器 */
+  .wheel-wrap{display:flex;gap:6px;position:relative;height:200px;overflow:hidden;margin:6px 0 14px;background:#f8fafc;border-radius:14px}
+  .wheel-col{flex:1;overflow-y:auto;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch;padding:80px 0;scrollbar-width:none}
+  .wheel-col::-webkit-scrollbar{display:none}
+  .wheel-item{height:40px;line-height:40px;text-align:center;scroll-snap-align:center;font-size:16px;color:#94a3b8;user-select:none}
+  .wheel-item.on{color:var(--brand);font-weight:700;font-size:18px}
+  .wheel-mask{position:absolute;left:6px;right:6px;top:80px;height:40px;border-top:1px solid #dbe3ea;border-bottom:1px solid #dbe3ea;
+    background:rgba(15,118,110,.07);pointer-events:none;border-radius:10px}
+  .wheel-unit{text-align:center;font-size:12px;color:var(--ink2);margin:-8px 0 10px}
+  .field .rolabel{position:relative;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:15px;background:#fff;
+    display:flex;align-items:center;cursor:pointer;min-height:42px}
+  .field .rolabel.empty{color:#94a3b8}
+  .field .rolabel .hintarrow{margin-left:auto;color:#cbd5e1;font-size:13px}
+  .manual-toggle{font-size:11px;color:var(--brand);float:right;cursor:pointer;font-weight:600}
+
+  /* 库存分类横滑 */
+  .catrow{display:flex;gap:8px;padding:10px 16px 2px;overflow-x:auto;scrollbar-width:none}
+  .catrow::-webkit-scrollbar{display:none}
+  .catchip{flex:none;border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 13px;font-size:13px;cursor:pointer;white-space:nowrap;color:var(--ink2)}
+  .catchip.on{color:#fff;font-weight:600;border-color:transparent}
+  .bell.small{width:36px;height:36px;font-size:16px;border-radius:11px}
+
   /* FAB 动作菜单 */
   .actsheet{padding:16px 16px 6px}
   .actbtn{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px 14px;margin-bottom:10px;cursor:pointer}
@@ -256,10 +278,12 @@
           <h1>📦 库存</h1>
           <div class="sub">只显示当前有库存的物品 · 档案请到「档案」查看</div>
         </div>
+        <button class="bell small" id="refreshBtn" title="刷新数据">⟳</button>
         <button class="bell" id="bellBtn" title="查看提醒">🔔<span id="bellBadge" class="badge hidden">0</span></button>
       </div>
     </div>
     <div class="progress-tip hidden" id="demoTip">已载入示例：库存界面只显示有货物品；「可口可乐」等零库存档案请到「🗂️ 档案」查看，重新录入库存时可在分类目录里选中它。</div>
+    <div class="catrow" id="stockCatChips"></div>
     <div class="chips" id="chips"></div>
     <div class="toolbar">
       <div class="search">
@@ -286,6 +310,7 @@
           <h1>🗂️ 物品档案</h1>
           <div class="sub">建档一次永久保留 · 库存删空也不会消失</div>
         </div>
+        <button class="bell small" id="arcRefreshBtn" title="刷新数据">⟳</button>
         <button class="bell" id="catManageBtn" title="管理分类">🏷️</button>
       </div>
     </div>
@@ -399,7 +424,7 @@
 <!-- 物品档案表单 -->
 <div class="overlay" id="masterSheet">
   <div class="sheet">
-    <button class="close-x" data-close="masterSheet">✕</button>
+    <button class="close-x" id="m_close">✕</button>
     <h2 id="masterSheetTitle">新建物品档案</h2>
     <div class="tagline hidden" id="dupWarn">📌 已存在同名档案，保存将直接使用该档案（如需改名请先编辑原档案）。</div>
     <div class="field"><label>物品名称 <span class="req">*</span></label><input id="m_name" maxlength="40" placeholder="例如：润护乳"></div>
@@ -417,7 +442,7 @@
     </div>
     <div class="field"><label>备注 <span class="opt">(选填)</span></label><input id="m_note" maxlength="80" placeholder="品牌、规格、常购渠道等"></div>
     <div class="row-actions">
-      <button class="btn ghost" data-close="masterSheet">取消</button>
+      <button class="btn ghost" id="m_cancel">取消</button>
       <button class="btn" id="m_save">保存档案</button>
     </div>
   </div>
@@ -458,13 +483,35 @@
     <h2 id="batchSheetTitle">新增库存批次</h2>
     <div class="tagline" id="batchItemLine"></div>
     <div class="form-grid">
-      <div class="field"><label>数量 <span class="req">*</span></label><input id="b_qty" type="number" min="1" step="1" placeholder="1"></div>
-      <div class="field"><label>过期日期</label><input id="b_expiry" type="date"><div class="hint">不填则不监控过期</div></div>
+      <div class="field">
+        <label>数量 <span class="req">*</span><span class="manual-toggle" id="b_qtyManual">手动输入</span></label>
+        <div class="rolabel" id="b_qtyLabel">1<span class="hintarrow">滚轮选择 ›</span></div>
+        <input id="b_qty" type="number" min="1" step="1" class="hidden">
+      </div>
+      <div class="field">
+        <label>过期日期</label>
+        <div class="rolabel empty" id="b_expiryLabel">不设置<span class="hintarrow">滚轮选择 ›</span></div>
+        <input id="b_expiry" type="date" class="hidden">
+        <div class="hint">不填则不监控过期</div>
+      </div>
       <div class="field" style="grid-column:1 / -1"><label>批次备注</label><input id="b_note" maxlength="60" placeholder="如：双十一购入 / 朋友送的"></div>
     </div>
     <div class="row-actions">
       <button class="btn ghost" data-close="batchSheet">取消</button>
       <button class="btn" id="b_save">保存批次</button>
+    </div>
+  </div>
+</div>
+
+<!-- 滚轮选择器 -->
+<div class="overlay" id="wheelSheet">
+  <div class="sheet">
+    <button class="close-x" data-close="wheelSheet">✕</button>
+    <h2 id="wheelTitle">选择数量</h2>
+    <div id="wheelBody"></div>
+    <div class="row-actions">
+      <button class="btn ghost" data-close="wheelSheet">取消</button>
+      <button class="btn" id="wheelOk">完成</button>
     </div>
   </div>
 </div>
@@ -603,6 +650,26 @@ function ensureCat(name){
 }
 function catCount(name){
   return M.filter(function(m){ return catOf(m) === name; }).length;
+}
+var CAT_PALETTE = [
+  { bg:"#e0f2fe", fg:"#0369a1" },
+  { bg:"#dcfce7", fg:"#15803d" },
+  { bg:"#fef3c7", fg:"#92400e" },
+  { bg:"#fae8ff", fg:"#a21caf" },
+  { bg:"#ffe4e6", fg:"#be123c" },
+  { bg:"#e0e7ff", fg:"#4338ca" },
+  { bg:"#ccfbf1", fg:"#0f766e" },
+  { bg:"#fef9c3", fg:"#a16207" }
+];
+function catColor(name){
+  if (!name || name === defaultCat()) return { bg:"#f1f5f9", fg:"#64748b" };
+  var h = 0, s = String(name);
+  for (var i=0;i<s.length;i++) h = (h * 31 + s.charCodeAt(i)) % 9973;
+  return CAT_PALETTE[h % CAT_PALETTE.length];
+}
+function catBadge(name){
+  var c = catColor(name);
+  return '<span class="cattag" style="background:' + c.bg + ';color:' + c.fg + '">' + esc(name) + '</span>';
 }
 function stockMasters(){ return M.filter(function(m){ return totalStock(m) > 0; }); }
 function masterById(id){ for (var i=0;i<M.length;i++) if (M[i].id===id) return M[i]; return null; }
@@ -769,7 +836,7 @@ function purgeMasterLogs(m){
    ============================================================ */
 var UI = { tab:"home", filter:"all", sort:"urgency", search:"", detailId:null,
   masterMode:"new", pickTarget:null, pickQuery:"", sel:new Set(), batchEditId:null, batchItemId:null,
-  catFilter:"all", arcSearch:"", openCats:{}, openCatsInit:false, presetCat:null };
+  catFilter:"all", arcSearch:"", openCats:{}, openCatsInit:false, presetCat:null, stockCat:"all", returnToDetail:null };
 
 /* ---------- Toast ---------- */
 function toast(html, type, itemId){
@@ -794,7 +861,12 @@ function toast(html, type, itemId){
   setTimeout(function(){ d.remove(); }, type ? 7000 : 2500);
 }
 
-function openSheet(id){ $("#" + id).classList.add("open"); }
+var zTop = 100;
+function openSheet(id){
+  var el = $("#" + id);
+  el.style.zIndex = (++zTop);   // 后打开的弹层永远在上层
+  el.classList.add("open");
+}
 function closeSheet(id){ $("#" + id).classList.remove("open"); }
 
 var confirmAction = null;
@@ -823,6 +895,9 @@ function itemCounts(){
 }
 function filteredMasters(){
   var arr = stockMasters();
+  if (UI.stockCat !== "all"){
+    arr = arr.filter(function(m){ return catOf(m) === UI.stockCat; });
+  }
   if (UI.search){
     var kw = norm(UI.search);
     arr = arr.filter(function(m){ return norm(m.name).indexOf(kw) >= 0 || norm(m.note).indexOf(kw) >= 0; });
@@ -874,7 +949,28 @@ function renderChips(){
       '<div class="n">' + d.n + '</div><div class="t">' + d.label + '</div></div>';
   }).join("");
 }
+function renderStockCats(){
+  var inStock = stockMasters();
+  var defs = [{ k:"all", label:"全部", n:inStock.length, color:null }];
+  catsUsed().forEach(function(name){
+    var n = inStock.filter(function(m){ return catOf(m) === name; }).length;
+    if (n > 0) defs.push({ k:name, label:name, n:n, color:catColor(name) });
+  });
+  if (UI.stockCat !== "all" && !defs.some(function(d){ return d.k === UI.stockCat; })) UI.stockCat = "all";
+  $("#stockCatChips").innerHTML = defs.map(function(d){
+    var style = "";
+    if (d.k === UI.stockCat){
+      var cc = d.color || { bg:"#0f766e", fg:"#fff" };
+      style = ' style="background:' + cc.bg + ';color:' + cc.fg + ';border-color:transparent"';
+    } else if (d.color){
+      style = ' style="border-color:' + d.color.bg + '"';
+    }
+    return '<div class="catchip' + (d.k===UI.stockCat ? " on":"") + '" data-stockcat="' + esc(d.k) + '"' + style + '>' +
+      esc(d.label) + ' ' + d.n + '</div>';
+  }).join("");
+}
 function renderHome(){
+  renderStockCats();
   renderChips();
   var box = $("#list");
   if (M.length === 0){
@@ -985,7 +1081,7 @@ function renderArchive(){
       '<div class="body">' +
         '<div class="top"><span class="name"><span class="nm">' + esc(m.name) + '</span>' +
           (m.unit ? '<span class="unit-tag">' + esc(m.unit) + '</span>' : "") +
-          '<span class="cattag">' + esc(catOf(m)) + '</span></span>' +
+          catBadge(catOf(m)) + '</span>' +
           '<span class="tag">' + a.tag + '</span></div>' +
         '<div class="meta"><span class="qty"><b>' + t + '</b> ' + esc(m.unit||"个") + '</span>' +
           (th !== null ? '<span class="qty" style="font-size:11px;color:#94a3b8">阈值 ' + th + '</span>' : "") +
@@ -1043,6 +1139,7 @@ function updateCartBadge(){
    ============================================================ */
 function openMasterSheet(m, quickTarget){
   UI.masterMode = m ? "edit" : (quickTarget ? "quick" : "new");
+  if (!m) UI.returnToDetail = null;
   UI.pickTarget = quickTarget || null;
   $("#masterSheetTitle").textContent = m ? "编辑物品档案" : "新建物品档案";
   $("#m_name").value = m ? m.name : "";
@@ -1064,6 +1161,14 @@ function renderCatSelect(selected){
   $("#m_cat").innerHTML = opts.map(function(c){
     return '<option value="' + esc(c) + '"' + (c===selected ? " selected":"") + '>' + esc(c) + '</option>';
   }).join("") + '<option value="__new__">＋ 新建分类…</option>';
+}
+function closeMasterSheet(){
+  closeSheet("masterSheet");
+  if (UI.returnToDetail){
+    var id = UI.returnToDetail;
+    UI.returnToDetail = null;
+    openDetail(id);          // 取消/关闭编辑时也回到原物品页
+  }
 }
 function saveMaster(){
   var name = $("#m_name").value.trim();
@@ -1092,6 +1197,7 @@ function saveMaster(){
   closeSheet("masterSheet");
   renderAll();
   refreshDetail();
+  if (UI.returnToDetail){ var backId = UI.returnToDetail; UI.returnToDetail = null; openDetail(backId); }
   toast("档案已更新 ✓");
     }
     return;
@@ -1174,7 +1280,7 @@ function renderPicker(){
     var open = !!UI.openCats[g.cat];
     return '<div class="catgroup' + (open ? " open":"") + '" data-catgroup="' + esc(g.cat) + '">' +
       '<div class="cathead" data-cattoggle="' + esc(g.cat) + '">' +
-        '<span class="cname">' + esc(g.cat) + '</span>' +
+        '<span class="cname">' + catBadge(g.cat) + '</span>' +
         '<span class="ccount">' + g.list.length + ' 项</span>' +
         '<span class="carrow">›</span></div>' +
       (open ? '<div class="catitems">' + g.list.map(pickRow).join("") + '</div>' : "") +
@@ -1187,6 +1293,159 @@ function afterPick(m, target){
 }
 
 /* ---------- 分类管理 ---------- */
+/* ---------- 滚轮选择器（数量 / 过期日期） ---------- */
+var WHEEL = { cols:null, mode:null, onDone:null, onEmpty:null };
+
+function wheelsOpen(opts){
+  WHEEL.mode = opts.mode;
+  WHEEL.onDone = opts.onDone || null;
+  WHEEL.onEmpty = opts.onEmpty || null;
+  WHEEL.cols = opts.cols.map(function(c){
+    return { items:c.items, index:Math.max(0, Math.min(c.items.length-1, c.index||0)) };
+  });
+  $("#wheelTitle").textContent = opts.title;
+  renderWheelBody();
+  openSheet("wheelSheet");
+}
+function renderWheelBody(){
+  var html = "";
+  if (WHEEL.mode === "date"){
+    html += '<button class="btn sm ghost" id="wheelNoDate" style="width:100%;margin-bottom:10px">不设置过期日期</button>';
+  }
+  if (WHEEL.mode === "qty") html += '<div class="wheel-unit">向上/向下滑动选择数量</div>';
+  html += '<div class="wheel-wrap">' + WHEEL.cols.map(function(col, ci){
+    return '<div class="wheel-col" data-col="' + ci + '">' + col.items.map(function(it, ii){
+      return '<div class="wheel-item' + (ii===col.index ? " on":"") + '" data-i="' + ii + '">' + esc(it.label) + '</div>';
+    }).join("") + '</div>';
+  }).join("") + '<div class="wheel-mask"></div></div>';
+  $("#wheelBody").innerHTML = html;
+  WHEEL.cols.forEach(function(col, ci){
+    var el = $("#wheelBody").querySelector('[data-col="' + ci + '"]');
+    el.scrollTop = col.index * 40;
+    var timer = null;
+    el.addEventListener("scroll", function(){
+      clearTimeout(timer);
+      timer = setTimeout(function(){ wheelSnap(el, ci); }, 110);
+    }, { passive:true });
+  });
+  var noDate = document.getElementById("wheelNoDate");
+  if (noDate) noDate.addEventListener("click", function(){
+    if (WHEEL.onEmpty) WHEEL.onEmpty();
+    closeSheet("wheelSheet");
+  });
+}
+function wheelSnap(el, ci){
+  var items = el.querySelectorAll(".wheel-item");
+  var idx = Math.round(el.scrollTop / 40);
+  idx = Math.max(0, Math.min(items.length - 1, idx));
+  for (var i=0;i<items.length;i++) items[i].classList.toggle("on", i === idx);
+  WHEEL.cols[ci].index = idx;
+  if (WHEEL.mode === "date" && (ci === 0 || ci === 1)) refreshDayColumn();
+}
+function wheelValues(){
+  var out = [];
+  WHEEL.cols.forEach(function(col){ out.push(col.items[col.index]); });
+  return out;
+}
+function wheelYearMonth(){
+  var v = wheelValues();
+  return { y: v[0].v, m: v[1].v };
+}
+function daysInMonth(y, m){ return new Date(y, m, 0).getDate(); }
+function refreshDayColumn(){
+  var col = WHEEL.cols[2];
+  if (!col) return;
+  var ym = wheelYearMonth();
+  var maxD = daysInMonth(ym.y, ym.m);
+  var curDay = col.items[col.index] ? col.items[col.index].v : 1;
+  if (curDay > maxD) curDay = maxD;
+  col.items = [];
+  for (var d=1; d<=maxD; d++) col.items.push({ v:d, label:d + " 日" });
+  col.index = curDay - 1;
+  var el = $("#wheelBody").querySelector('[data-col="2"]');
+  if (!el) return;
+  el.innerHTML = col.items.map(function(it, ii){
+    return '<div class="wheel-item' + (ii===col.index ? " on":"") + '" data-i="' + ii + '">' + esc(it.label) + '</div>';
+  }).join("");
+  el.scrollTop = col.index * 40;
+}
+function openQtyWheel(current, cb){
+  var items = [];
+  for (var i=0;i<=500;i++) items.push({ v:i, label:i + "" });
+  var idx = Math.max(0, Math.min(500, parseInt(current,10)||0));
+  wheelsOpen({
+    mode:"qty", title:"选择数量",
+    cols:[{ items:items, index:idx }],
+    onDone: function(){ cb(String(wheelValues()[0].v)); }
+  });
+}
+function openDateWheel(current, cb){
+  var today = new Date();
+  var base = current && isDateKey(current) ? parseKey(current) : null;
+  var years = [];
+  for (var y = today.getFullYear()-1; y <= today.getFullYear()+30; y++) years.push({ v:y, label:y + " 年" });
+  var months = [];
+  for (var m=1;m<=12;m++) months.push({ v:m, label:m + " 月" });
+  var y0 = base ? base.getFullYear() : today.getFullYear() + 1;
+  var m0 = base ? base.getMonth()+1 : today.getMonth()+1;
+  var d0 = base ? base.getDate() : today.getDate();
+  var days = [];
+  var maxD = daysInMonth(y0, m0);
+  if (d0 > maxD) d0 = maxD;
+  for (var d=1; d<=maxD; d++) days.push({ v:d, label:d + " 日" });
+  wheelsOpen({
+    mode:"date", title:"选择过期日期",
+    cols:[
+      { items:years, index:Math.max(0, y0 - (today.getFullYear()-1)) },
+      { items:months, index:m0-1 },
+      { items:days, index:d0-1 }
+    ],
+    onDone: function(){
+      var v = wheelValues();
+      var yy = v[0].v, mm = v[1].v, dd = Math.min(v[2].v, daysInMonth(yy, mm));
+      cb(yy + "-" + pad(mm) + "-" + pad(dd));
+    },
+    onEmpty: function(){ cb(""); }
+  });
+}
+/* 显示值同步到（隐藏的）输入框与展示标签 */
+function setQtyField(val){
+  $("#b_qty").value = val;
+  $("#b_qtyLabel").textContent = "";
+  $("#b_qtyLabel").appendChild(document.createTextNode(val + " "));
+  var ar = document.createElement("span");
+  ar.className = "hintarrow"; ar.textContent = "滚轮选择 ›";
+  $("#b_qtyLabel").appendChild(ar);
+}
+function setExpiryField(val){
+  $("#b_expiry").value = val || "";
+  var lab = $("#b_expiryLabel");
+  lab.textContent = "";
+  if (val){ lab.classList.remove("empty"); lab.appendChild(document.createTextNode(val + " ")); }
+  else { lab.classList.add("empty"); lab.appendChild(document.createTextNode("不设置 ")); }
+  var ar = document.createElement("span");
+  ar.className = "hintarrow"; ar.textContent = "滚轮选择 ›";
+  lab.appendChild(ar);
+}
+
+function resetBatchFields(qty, expiry){
+  $("#b_qty").classList.add("hidden");
+  $("#b_qtyLabel").classList.remove("hidden");
+  $("#b_qtyManual").textContent = "手动输入";
+  setQtyField(qty || 1);
+  setExpiryField(expiry || "");
+}
+
+/* ---------- 刷新 ---------- */
+function refreshAll(){
+  load();
+  renderAll();
+  if ($("#detailSheet").classList.contains("open")) renderDetail();
+  if ($("#catSheet").classList.contains("open")) renderCatMgmt();
+  window.scrollTo(0, 0);
+  toast("已刷新：在库 " + stockMasters().length + " 种 · 档案 " + M.length + " 条");
+}
+
 function renderCatMgmt(){
   var used = catsUsed();
   var box = $("#catMgmtList");
@@ -1254,17 +1513,14 @@ function openBatchSheet(m, bid, restock){
   if (isEdit){
     var b = B.find(function(x){ return x.id===bid; }) || null;
     if (b){
-      $("#b_qty").value = b.qty;
-      $("#b_expiry").value = b.expiry || "";
+      resetBatchFields(b.qty, b.expiry || "");
       $("#b_note").value = b.note || "";
     }
   } else if (isRestock){
-    $("#b_qty").value = m.refillQty || settings.defRefill || 5;
-    $("#b_expiry").value = "";
+    resetBatchFields(m.refillQty || settings.defRefill || 5, "");
     $("#b_note").value = "新补货";
   } else {
-    $("#b_qty").value = 1;
-    $("#b_expiry").value = "";
+    resetBatchFields(1, "");
     $("#b_note").value = "";
   }
   openSheet("batchSheet");
@@ -1297,7 +1553,7 @@ function saveBatch(){
   renderAll();
   refreshDetail();
   resolveAlerts();
-  toast("已为该档案新增 1 个批次（" + qty + " " + esc(m.unit||"个") + "）✓");
+  toast("已入库：" + qty + " " + esc(m.unit||"个") + "「" + m.name + "」，现在共 " + totalStock(m) + " " + esc(m.unit||"个") + " ✓");
 }
 
 /* ============================================================
@@ -1435,6 +1691,8 @@ function renderDetail(){
   $("#detailBack").addEventListener("click", function(){ closeSheet("detailSheet"); });
   $("#dEditMaster").addEventListener("click", function(){
     UI.detailId = m.id;
+    UI.returnToDetail = m.id;          // 编辑完成后回到该物品页
+    closeSheet("detailSheet");
     openMasterSheet(m);
   });
   $("#dClearStock").addEventListener("click", function(){
@@ -1519,8 +1777,7 @@ function openCartLine(m){
     UI.cartItemId = m.id;
     $("#batchSheetTitle").textContent = "加入购物篮";
     $("#batchItemLine").innerHTML = "🏷️ 将加入购物篮：<b>" + esc(m.name) + "</b>（" + esc(m.unit||"个") + "）";
-    $("#b_qty").value = 1;
-    $("#b_expiry").value = "";
+    resetBatchFields(1, "");
     $("#b_note").value = "";
     openSheet("batchSheet");
   }
@@ -1853,6 +2110,8 @@ function bind(){
 
   /* 档案 */
   $("#m_save").addEventListener("click", saveMaster);
+  $("#m_close").addEventListener("click", closeMasterSheet);
+  $("#m_cancel").addEventListener("click", closeMasterSheet);
   $("#m_cat").addEventListener("change", function(e){
     var isNew = e.target.value === "__new__";
     $("#m_catNew").classList.toggle("hidden", !isNew);
@@ -1920,6 +2179,32 @@ function bind(){
     if (UI.tab === "cart" || UI.cartItemId) addCartFromBatchSheet();
     else saveBatch();
   });
+  $("#b_qtyLabel").addEventListener("click", function(){ openQtyWheel($("#b_qty").value || 1, setQtyField); });
+  $("#b_expiryLabel").addEventListener("click", function(){ openDateWheel($("#b_expiry").value, setExpiryField); });
+  $("#b_qtyManual").addEventListener("click", function(){
+    var inp = $("#b_qty"), lab = $("#b_qtyLabel"), tg = $("#b_qtyManual");
+    if (inp.classList.contains("hidden")){
+      inp.classList.remove("hidden"); lab.classList.add("hidden");
+      tg.textContent = "滚轮选择"; inp.focus();
+    } else {
+      inp.classList.add("hidden"); lab.classList.remove("hidden");
+      setQtyField(inp.value || 1);
+      tg.textContent = "手动输入";
+    }
+  });
+  $("#wheelOk").addEventListener("click", function(){
+    var cb = WHEEL.onDone;
+    closeSheet("wheelSheet");
+    if (cb) cb();
+  });
+  $("#refreshBtn").addEventListener("click", refreshAll);
+  $("#arcRefreshBtn").addEventListener("click", refreshAll);
+  $("#stockCatChips").addEventListener("click", function(e){
+    var c = e.target.closest("[data-stockcat]");
+    if (!c) return;
+    UI.stockCat = c.dataset.stockcat;
+    renderHome();
+  });
 
   /* 购物篮 */
   $("#cartAddBtn").addEventListener("click", function(){
@@ -1946,8 +2231,7 @@ function bind(){
       UI.cartEditName = c.name;
       $("#batchSheetTitle").textContent = "修改购物篮条目";
       $("#batchItemLine").innerHTML = "🏷️ 物品：<b>" + esc(c.name) + "</b>（" + esc(c.unit||"个") + "）";
-      $("#b_qty").value = c.qty;
-      $("#b_expiry").value = c.expiry || "";
+      resetBatchFields(c.qty, c.expiry || "");
       $("#b_note").value = c.note || "";
       UI.cartEditIndex = i;
       openSheet("batchSheet");
