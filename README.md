@@ -25,14 +25,6 @@ icons/                  应用图标
 .nojekyll               让 GitHub Pages 原样发布静态文件
 ```
 
-## 部署到 GitHub Pages（网页版操作，最省事）
-
-1. 登录 GitHub → 右上角 `+` → **New repository**。
-2. 仓库名填 `xiaokucun`（随意），可见性选 **Public**（免费 Pages 需要公开仓库），不要勾选初始化 README，点 **Create repository**。
-3. 在新仓库页面点 **uploading an existing file**，把本文件夹里的所有内容（`index.html`、`manifest.webmanifest`、`sw.js`、`icons/`、`.nojekyll`）拖进去，点 **Commit changes**。
-4. 仓库 **Settings → Pages** → *Build and deployment* → Source 选 **Deploy from a branch**，Branch 选 **main** + **/ (root)**，点 Save。
-5. 等 1 分钟左右，页面顶部会出现网址：`https://<你的用户名>.github.io/xiaokucun/`。
-
 ## 在 iPhone 上使用
 
 1. 用 **Safari** 打开 `https://<你的用户名>.github.io/xiaokucun/`。
