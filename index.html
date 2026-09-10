@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0f766e">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -43,10 +43,10 @@
 
   .toolbar{display:flex;gap:8px;padding:10px 16px 4px;align-items:center}
   .search{flex:1;position:relative}
-  .search input{width:100%;border:1px solid var(--line);background:#fff;border-radius:12px;padding:8px 12px 8px 32px;font-size:14px;outline:none}
+  .search input{width:100%;border:1px solid var(--line);background:#fff;border-radius:12px;padding:9px 12px 9px 32px;font-size:16px;outline:none}
   .search svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#94a3b8}
   .select-wrap{position:relative}
-  .select-wrap select{appearance:none;border:1px solid var(--line);background:#fff;border-radius:12px;padding:8px 10px 8px 24px;font-size:13px;color:var(--ink);cursor:pointer;outline:none}
+  .select-wrap select{appearance:none;border:1px solid var(--line);background:#fff;border-radius:12px;padding:9px 10px 9px 24px;font-size:16px;color:var(--ink);cursor:pointer;outline:none}
   .select-wrap::before{content:"⇅";position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:12px;color:#94a3b8}
 
   .list{padding:10px 16px 130px}
@@ -116,7 +116,7 @@
   .set-row .arrow{color:#cbd5e1}
   .set-sub{padding:13px 16px;border-bottom:1px solid #f1f5f9}
   .set-sub label{display:block;font-size:12px;color:var(--ink2);margin-bottom:5px}
-  .set-sub input,.set-sub select{border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:14px;width:100%;outline:none}
+  .set-sub input,.set-sub select{border:1px solid var(--line);border-radius:10px;padding:9px 10px;font-size:16px;width:100%;outline:none}
   .mini-inline{display:flex;gap:10px}.mini-inline>div{flex:1}
   .switch{position:relative;width:46px;height:26px;flex:none}
   .switch input{opacity:0;width:0;height:0}
@@ -158,14 +158,14 @@
   .field{margin-bottom:12px}
   .field label{display:block;font-size:12px;color:var(--ink2);margin-bottom:5px;font-weight:500}
   .field label .req{color:#e11d48}
-  .field input,.field select,.field textarea{width:100%;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:15px;outline:none;background:#fff;font-family:inherit}
+  .field input,.field select,.field textarea{width:100%;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:16px;outline:none;background:#fff;font-family:inherit}
   .field input:focus,.field textarea:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(13,148,136,.12)}
   .field .hint{font-size:11px;color:#94a3b8;margin-top:4px}
   .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
   .row-actions{display:flex;gap:10px;margin-top:16px}.row-actions .btn{flex:1}
   .tagline{display:flex;align-items:flex-start;gap:8px;background:#fffbeb;border:1px solid #fde68a;color:#92400e;border-radius:12px;padding:8px 10px;font-size:12px;margin-bottom:12px}
   .progress-tip{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;border-radius:12px;padding:9px 11px;font-size:12px;margin:10px 16px 0}
-  textarea.code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;line-height:1.6;min-height:120px}
+  textarea.code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:16px;line-height:1.6;min-height:120px}
 
   /* 物品批次明细 */
   .detail-head{background:linear-gradient(135deg,#0f766e,#0d9488 60%,#14b8a6);color:#fff;padding:14px 18px;border-radius:0 0 18px 18px;margin:-8px -20px 0;display:flex;align-items:center;gap:12px}
@@ -234,11 +234,13 @@
   .wheel-mask{position:absolute;left:6px;right:6px;top:80px;height:40px;border-top:1px solid #dbe3ea;border-bottom:1px solid #dbe3ea;
     background:rgba(15,118,110,.07);pointer-events:none;border-radius:10px}
   .wheel-unit{text-align:center;font-size:12px;color:var(--ink2);margin:-8px 0 10px}
-  .field .rolabel{position:relative;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:15px;background:#fff;
+  .field .rolabel{position:relative;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:16px;background:#fff;
     display:flex;align-items:center;cursor:pointer;min-height:42px}
   .field .rolabel.empty{color:#94a3b8}
   .field .rolabel .hintarrow{margin-left:auto;color:#cbd5e1;font-size:13px}
   .manual-toggle{font-size:11px;color:var(--brand);float:right;cursor:pointer;font-weight:600}
+  .chkrow{display:flex;align-items:center;gap:9px;padding:12px 2px;font-size:14px;cursor:pointer;color:var(--ink)}
+  .chkrow input{width:18px;height:18px;flex:none}
 
   /* 库存分类横滑 */
   .catrow{display:flex;gap:8px;padding:10px 16px 2px;overflow-x:auto;scrollbar-width:none}
@@ -265,6 +267,11 @@
   .big-restock .to{font-size:14px;margin-top:8px;background:#f0fdfa;border-radius:10px;padding:8px;color:#065f46}
   .dl-row{display:flex;gap:10px;margin-top:18px}.dl-row .btn{flex:1}
   .subtle{font-size:12px;color:var(--ink2)}
+
+  /* 固定页面比例：避免 iOS 聚焦输入框时自动放大、以及双指缩放 */
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+  body{touch-action:manipulation}
+  input,select,textarea{font-size:16px}
 </style>
 </head>
 <body>
@@ -372,6 +379,7 @@
     <div class="sec-title">数据管理</div>
     <div class="set-group">
       <div class="set-row" data-act="export"><span class="em">⬇️</span><span class="st"><b>导出 CSV（备份）</b><span id="exportSub">备份到本地文件</span></span><span class="arrow">›</span></div>
+      <div class="set-row" data-act="backuploc"><span class="em">📂</span><span class="st"><b>备份文件位置</b><span id="backupLocSub">默认：浏览器下载</span></span><span class="arrow">›</span></div>
       <div class="set-row" data-act="import"><span class="em">⬆️</span><span class="st"><b>导入 CSV（恢复 / 批量录入）</b><span>可选文件或粘贴文本，同名自动归入同一档案</span></span><span class="arrow">›</span></div>
       <div class="set-row" data-act="clearall"><span class="em">🗑️</span><span class="st"><b>清空全部数据</b><span>删除所有档案、批次与购物篮</span></span><span class="arrow">›</span></div>
     </div>
@@ -516,6 +524,38 @@
   </div>
 </div>
 
+<!-- 编辑后 · 备份提醒 -->
+<div class="overlay" id="backupSheet">
+  <div class="sheet">
+    <button class="close-x" id="backupClose">✕</button>
+    <div style="text-align:center;padding:12px 0 2px">
+      <div style="font-size:40px">💾</div>
+      <h2 style="margin:8px 0 4px">建议现在备份</h2>
+      <div class="subtle" id="backupMsg">你刚修改了数据。数据只保存在这台设备的浏览器里，建议定期导出 CSV 备份。</div>
+    </div>
+    <div class="tagline" id="backupLocLine" style="margin-top:12px">📂 备份位置：浏览器下载</div>
+    <label class="chkrow"><input type="checkbox" id="backupSnooze"> <span>5 分钟内不再提醒（期间继续操作仍会到期提醒）</span></label>
+    <div class="dl-row">
+      <button class="btn ghost" id="backupLater">稍后</button>
+      <button class="btn" id="backupNowBtn">立即备份</button>
+    </div>
+    <div class="subtle" style="text-align:center;margin-top:10px" id="backupLastLine"></div>
+  </div>
+</div>
+
+<!-- 备份位置设置 -->
+<div class="overlay" id="backupLocSheet">
+  <div class="sheet">
+    <button class="close-x" data-close="backupLocSheet">✕</button>
+    <h2>备份文件位置</h2>
+    <div id="backupLocBody"></div>
+    <div class="row-actions">
+      <button class="btn ghost" data-close="backupLocSheet">完成</button>
+      <button class="btn" id="pickLocBtn">选择备份文件</button>
+    </div>
+  </div>
+</div>
+
 <!-- 物品批次明细 -->
 <div class="overlay" id="detailSheet">
   <div class="sheet" style="padding:0 0 calc(16px + env(safe-area-inset-bottom))">
@@ -589,7 +629,9 @@ var M = [];   // 物品档案
 var B = [];   // 库存批次
 var cart = []; // 购物篮
 var logs = [];
-var settings = { defUnit:"个", defRefill:5, notify:false, lastCheck:0, lastSent:{}, cats:[] };
+var booting = true;   // 启动/演示数据阶段不触发“编辑后提醒备份”
+var settings = { defUnit:"个", defRefill:5, notify:false, lastCheck:0, lastSent:{}, cats:[],
+  lastEdit:0, lastExport:0, backupSnoozeUntil:0, backupFileName:"我的小库存备份.csv" };
 
 function load(){
   try{ M = JSON.parse(localStorage.getItem(LS_M)) || []; }catch(e){ M=[]; }
@@ -602,7 +644,8 @@ function load(){
     l.read = false;
     return l;
   });
-  try{ settings = Object.assign({ defUnit:"个", defRefill:5, notify:false, lastCheck:0, lastSent:{}, cats:[] }, JSON.parse(localStorage.getItem(LS_SET)) || {}); }catch(e){}
+  try{ settings = Object.assign({ defUnit:"个", defRefill:5, notify:false, lastCheck:0, lastSent:{}, cats:[],
+    lastEdit:0, lastExport:0, backupSnoozeUntil:0, backupFileName:"我的小库存备份.csv" }, JSON.parse(localStorage.getItem(LS_SET)) || {}); }catch(e){}
   if (!Array.isArray(settings.cats)) settings.cats = [];
   M.forEach(function(m){ if (!m.cat) m.cat = "未分类"; });
   if (M.length === 0){
@@ -627,9 +670,15 @@ function load(){
   }
 }
 function saveAll(){ saveM(); saveB(); saveCart(); saveState(); }
-function saveM(){ localStorage.setItem(LS_M, JSON.stringify(M)); }
-function saveB(){ localStorage.setItem(LS_B, JSON.stringify(B)); }
-function saveCart(){ localStorage.setItem(LS_CART, JSON.stringify(cart)); }
+function touchEdit(){
+  if (booting) return;
+  settings.lastEdit = Date.now();
+  saveState();
+  scheduleBackupReminder();
+}
+function saveM(){ localStorage.setItem(LS_M, JSON.stringify(M)); touchEdit(); }
+function saveB(){ localStorage.setItem(LS_B, JSON.stringify(B)); touchEdit(); }
+function saveCart(){ localStorage.setItem(LS_CART, JSON.stringify(cart)); touchEdit(); }
 function saveState(){ localStorage.setItem(LS_HIST, JSON.stringify(logs)); localStorage.setItem(LS_SET, JSON.stringify(settings)); }
 
 /* ---------- 模型查询 ---------- */
@@ -867,7 +916,10 @@ function openSheet(id){
   el.style.zIndex = (++zTop);   // 后打开的弹层永远在上层
   el.classList.add("open");
 }
-function closeSheet(id){ $("#" + id).classList.remove("open"); }
+function closeSheet(id){
+  $("#" + id).classList.remove("open");
+  if (!booting && id !== "backupSheet") scheduleBackupReminder(700);   // 关掉弹层后再考虑提醒备份
+}
 
 var confirmAction = null;
 function confirmBox(icon, title, text, yesText, action){
@@ -1872,6 +1924,9 @@ function splitCSVLine(line){
   return out;
 }
 function exportCSV(){
+  return backupNow();
+}
+function buildCSV(){
   if (!M.length && !B.length){ toast("暂无可导出的数据"); return; }
   var rows = [];
   M.forEach(function(m){
@@ -1889,23 +1944,220 @@ function exportCSV(){
       return /[",\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
     }).join(",");
   })).join("\n");
-  var blob = new Blob([csv], { type:"text/csv;charset=utf-8" });
-  var a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "我的小库存备份_" + todayKey() + ".csv";
-  document.body.appendChild(a);
-  a.click();
-  setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 500);
-  settings.lastExport = Date.now();
-  saveState();
-  updateExportSub();
-  toast("已导出 " + M.length + " 个档案 / " + B.length + " 条批次 ✓（请把文件存到「文件」App 或 iCloud 云盘）");
+  return csv;
+}
+function downloadCSV(text, name){
+  var fileName = name || ("我的小库存备份_" + todayKey() + ".csv");
+  try {
+    var blob = new Blob([text], { type:"text/csv;charset=utf-8" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = fileName;
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ try{ URL.revokeObjectURL(url); }catch(e){} a.remove(); }, 500);
+  } catch(e){
+    var a2 = document.createElement("a");
+    a2.href = "data:text/csv;charset=utf-8," + encodeURIComponent(text);
+    a2.download = fileName;
+    document.body.appendChild(a2); a2.click(); a2.remove();
+  }
 }
 function updateExportSub(){
   var el = $("#exportSub");
   if (!el) return;
   if (!settings.lastExport){ el.textContent = "备份到本地文件（尚未导出过，建议现在就导一次）"; return; }
   el.textContent = "上次导出：" + ago(settings.lastExport) + "（建议定期备份）";
+}
+
+/* ============================================================
+   备份位置（支持文件选择器的浏览器可绑定固定备份文件）
+   ============================================================ */
+var backupHandle = null;
+var BK_DB = "xkc_fs", BK_STORE = "handles";
+function idbOpen(){
+  return new Promise(function(res, rej){
+    if (!window.indexedDB) return rej(new Error("no-idb"));
+    var r = indexedDB.open(BK_DB, 1);
+    r.onupgradeneeded = function(){ if (!r.result.objectStoreNames.contains(BK_STORE)) r.result.createObjectStore(BK_STORE); };
+    r.onsuccess = function(){ res(r.result); };
+    r.onerror = function(){ rej(r.error); };
+  });
+}
+function idbSet(k, v){
+  return idbOpen().then(function(db){
+    return new Promise(function(res, rej){
+      var tx = db.transaction(BK_STORE, "readwrite");
+      tx.objectStore(BK_STORE).put(v, k);
+      tx.oncomplete = function(){ res(); };
+      tx.onerror = function(){ rej(tx.error); };
+    });
+  });
+}
+function idbGet(k){
+  return idbOpen().then(function(db){
+    return new Promise(function(res, rej){
+      var q = db.transaction(BK_STORE, "readonly").objectStore(BK_STORE).get(k);
+      q.onsuccess = function(){ res(q.result || null); };
+      q.onerror = function(){ rej(q.error); };
+    });
+  });
+}
+function idbDel(k){
+  return idbOpen().then(function(db){
+    return new Promise(function(res, rej){
+      var tx = db.transaction(BK_STORE, "readwrite");
+      tx.objectStore(BK_STORE).delete(k);
+      tx.oncomplete = function(){ res(); };
+      tx.onerror = function(){ rej(tx.error); };
+    });
+  });
+}
+function fsSupported(){ return typeof window.showSaveFilePicker === "function"; }
+function loadBackupHandle(){
+  if (!fsSupported()) return;
+  idbGet("backupFile").then(function(h){
+    if (h){ backupHandle = h; updateBackupLocSub(); }
+  }).catch(function(){});
+}
+function backupLocSummary(){
+  if (backupHandle && backupHandle.name) return "已绑定文件：" + backupHandle.name + "（每次备份自动写入）";
+  if (fsSupported()) return "浏览器下载（建议绑定一个固定备份文件）";
+  return "下载到「文件」App（iPhone 可到 设置 → Safari → 下载 选 iCloud 云盘）";
+}
+function updateBackupLocSub(){
+  var el = $("#backupLocSub");
+  if (el) el.textContent = backupLocSummary();
+}
+function renderBackupLocBody(){
+  var box = $("#backupLocBody");
+  if (!box) return;
+  var html = '<div class="tagline">📂 当前：' + esc(backupLocSummary()) + '</div>';
+  if (fsSupported()){
+    html += '<div class="subtle" style="margin-top:6px;line-height:1.7">绑定后点「立即备份」会直接覆盖写入这个文件，不用每次选位置（浏览器首次可能再确认一次权限）。</div>';
+    if (backupHandle && backupHandle.name){
+      html += '<button class="btn sm ghost" id="unbindLocBtn" style="width:100%;margin-top:12px">解除绑定（改回浏览器下载）</button>';
+    }
+  } else {
+    html += '<div class="subtle" style="margin-top:6px;line-height:1.8">'
+      + 'iPhone / iPad 的 Safari 不支持网页自动写入指定文件夹（系统限制），备份会走系统下载：<br>'
+      + '1）打开「设置」App →「Safari」→「下载」→ 选择 <b>iCloud 云盘</b> 或「我的 iPhone」；<br>'
+      + '2）建议再建一个文件夹（如「我的小库存」）；<br>'
+      + '3）此后每次点「立即备份」，文件都会存到那里，iCloud 会自动同步。</div>';
+  }
+  box.innerHTML = html;
+  var un = document.getElementById("unbindLocBtn");
+  if (un) un.addEventListener("click", unbindBackupLocation);
+}
+function chooseBackupLocation(){
+  if (!fsSupported()){
+    renderBackupLocBody();
+    openSheet("backupLocSheet");
+    toast("此浏览器不支持绑定位置，请按提示设置 Safari 下载位置");
+    return;
+  }
+  try {
+    window.showSaveFilePicker({
+      suggestedName: settings.backupFileName || "我的小库存备份.csv",
+      types: [{ description:"CSV 备份文件", accept:{ "text/csv":[".csv"] } }]
+    }).then(function(handle){
+      backupHandle = handle;
+      settings.backupFileName = handle.name || settings.backupFileName;
+      saveState();
+      return idbSet("backupFile", handle);
+    }).then(function(){
+      updateBackupLocSub();
+      renderBackupLocBody();
+      toast("已绑定备份文件：" + backupHandle.name + " ✓");
+    }).catch(function(){});
+  } catch(e){ toast("无法打开文件选择器，请改用 Safari 下载位置方案"); }
+}
+function unbindBackupLocation(){
+  backupHandle = null;
+  try { idbDel("backupFile").catch(function(){}); } catch(e){}
+  updateBackupLocSub();
+  renderBackupLocBody();
+  toast("已解除绑定，备份将走浏览器下载");
+}
+function writeToBackupHandle(text){
+  return backupHandle.createWritable().then(function(w){
+    return w.write(text).then(function(){ return w.close(); });
+  });
+}
+function backupNow(){
+  var text = buildCSV();
+  if (!text) return;
+  var fileName = (backupHandle && backupHandle.name) || settings.backupFileName || ("我的小库存备份_" + todayKey() + ".csv");
+  function finish(msg){
+    settings.lastExport = Date.now();
+    settings.backupSnoozeUntil = 0;
+    saveState();
+    updateExportSub();
+    updateBackupLocSub();
+    closeSheet("backupSheet");
+    toast(msg);
+  }
+  if (!backupHandle){
+    downloadCSV(text, fileName);
+    finish("已导出 " + M.length + " 个档案 / " + B.length + " 条批次 ✓" + (fsSupported() ? "" : "（文件在「文件」App 的下载位置）"));
+    return;
+  }
+  var perm = backupHandle.queryPermission ? backupHandle.queryPermission({ mode:"readwrite" }) : Promise.resolve("granted");
+  perm.then(function(state){
+    if (state === "granted") return state;
+    return backupHandle.requestPermission ? backupHandle.requestPermission({ mode:"readwrite" }) : "granted";
+  }).then(function(state){
+    if (state !== "granted") throw new Error("no-permission");
+    return writeToBackupHandle(text);
+  }).then(function(){
+    finish("已备份到 " + backupHandle.name + " ✓");
+  }).catch(function(){
+    downloadCSV(text, fileName);
+    finish("已改为下载备份文件（未能写入绑定位置）✓");
+  });
+}
+
+/* ============================================================
+   编辑后提醒备份（支持 5 分钟后再提醒）
+   ============================================================ */
+var backupTimer = null;
+function hasUnbackedupEdits(){ return (settings.lastEdit || 0) > (settings.lastExport || 0); }
+function anySheetOpen(){
+  var list = document.querySelectorAll(".overlay.open");
+  for (var i=0;i<list.length;i++){ if (list[i].id !== "backupSheet") return true; }
+  return false;
+}
+function scheduleBackupReminder(delay){
+  if (booting) return;
+  if (backupTimer) clearTimeout(backupTimer);
+  backupTimer = setTimeout(function(){ backupTimer = null; maybeShowBackupReminder(); }, delay === undefined ? 1200 : delay);
+}
+function maybeShowBackupReminder(){
+  if (booting) return;
+  if (!hasUnbackedupEdits()) return;
+  var snoozeUntil = settings.backupSnoozeUntil || 0;
+  if (Date.now() < snoozeUntil){ scheduleBackupReminder((snoozeUntil - Date.now()) + 400); return; }
+  if ($("#backupSheet").classList.contains("open")) return;
+  if (anySheetOpen()){ scheduleBackupReminder(1600); return; }
+  showBackupReminder();
+}
+function showBackupReminder(){
+  $("#backupMsg").textContent = "你刚修改了数据（在库 " + stockMasters().length + " 种 · 档案 " + M.length + " 条）。数据只保存在这台设备里，建议现在备份一份。";
+  $("#backupLocLine").innerHTML = "📂 " + esc(backupLocSummary());
+  $("#backupLastLine").textContent = settings.lastExport ? ("上次备份：" + ago(settings.lastExport)) : "还没有备份过，建议现在备份一次";
+  $("#backupSnooze").checked = false;
+  openSheet("backupSheet");
+}
+function dismissBackupReminder(snooze){
+  closeSheet("backupSheet");
+  if (snooze){
+    settings.backupSnoozeUntil = Date.now() + 5*60*1000;
+    saveState();
+    if (!booting) scheduleBackupReminder(5*60*1000 + 600);
+    toast("已设置：5 分钟后如仍未备份会再次提醒");
+  } else {
+    settings.backupSnoozeUntil = 0;
+    saveState();
+  }
 }
 function importResultToast(r){
   var msg = "导入完成：新增 " + r.addedM + " 个档案、" + r.addedB + " 条批次";
@@ -2014,6 +2266,9 @@ function seedDemo(){
   settings.lastSent = {};
   saveState();
   saveM(); saveB();
+  settings.lastEdit = 0;
+  settings.lastExport = Date.now();
+  saveState();
 }
 
 /* ============================================================
@@ -2035,7 +2290,7 @@ function switchTab(name){
 }
 function renderAll(){
   renderHome(); renderArchive(); renderReminders(); renderCart();
-  updateBell(); updateCartBadge(); updateExportSub();
+  updateBell(); updateCartBadge(); updateExportSub(); updateBackupLocSub();
 }
 
 /* ============================================================
@@ -2199,6 +2454,12 @@ function bind(){
   });
   $("#refreshBtn").addEventListener("click", refreshAll);
   $("#arcRefreshBtn").addEventListener("click", refreshAll);
+
+  /* 备份提醒弹窗 & 备份位置 */
+  $("#backupNowBtn").addEventListener("click", function(){ backupNow(); });
+  $("#backupLater").addEventListener("click", function(){ dismissBackupReminder($("#backupSnooze").checked); });
+  $("#backupClose").addEventListener("click", function(){ dismissBackupReminder($("#backupSnooze").checked); });
+  $("#pickLocBtn").addEventListener("click", chooseBackupLocation);
   $("#stockCatChips").addEventListener("click", function(e){
     var c = e.target.closest("[data-stockcat]");
     if (!c) return;
@@ -2268,6 +2529,7 @@ function bind(){
       var act = r.dataset.act;
       if (act==="newmaster") openMasterSheet(null);
       if (act==="export") exportCSV();
+      if (act==="backuploc"){ renderBackupLocBody(); openSheet("backupLocSheet"); }
       if (act==="import"){ $("#csvText").value=""; openSheet("importSheet"); }
       if (act==="demo"){
         seedDemo();
@@ -2348,6 +2610,24 @@ function bind(){
 /* ============================================================
    启动
    ============================================================ */
+function lockZoom(){
+  // 双指缩放（Safari 专有 gesture 事件）
+  ["gesturestart","gesturechange","gestureend"].forEach(function(ev){
+    document.addEventListener(ev, function(e){ e.preventDefault(); }, { passive:false });
+  });
+  // 多指触摸滑动（兜底）
+  document.addEventListener("touchmove", function(e){
+    if (e.touches && e.touches.length > 1) e.preventDefault();
+  }, { passive:false });
+  // 双击缩放
+  document.addEventListener("dblclick", function(e){ e.preventDefault(); }, { passive:false });
+  // 键盘弹出时不再让页面横向/整体缩放
+  if (window.visualViewport){
+    window.visualViewport.addEventListener("resize", function(){
+      if (document.documentElement.scrollLeft !== 0) window.scrollTo(0, window.scrollY);
+    }, { passive:true });
+  }
+}
 function init(){
   load();
   var seeded = localStorage.getItem(LS_SEED);
@@ -2360,12 +2640,16 @@ function init(){
   $("#defRefill").value = settings.defRefill || 5;
   $("#notifySw").checked = !!settings.notify;
   bind();
+  lockZoom();
   renderAll();
   switchTab("home");
   // 首次自动静默检查（不弹提示，只累计未读角标）
   if (!settings.lastCheck || Date.now() - settings.lastCheck > 6*3600*1000){
     setTimeout(function(){ runCheck(); updateBell(); }, 900);
   }
+  booting = false;
+  loadBackupHandle();
+  if (hasUnbackedupEdits()) scheduleBackupReminder(2500);
 }
 init();
 
