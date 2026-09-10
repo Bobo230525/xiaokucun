@@ -21,7 +21,9 @@
 index.html              应用本体（单文件，含全部界面与逻辑）
 manifest.webmanifest    PWA 清单（图标、名称、独立窗口）
 sw.js                   Service Worker（离线缓存）
-icons/                  应用图标
+icon-192.png
+icon-512.png
+apple-touch-icon.png    应用图标（不要改名或移动，需与其他文件同一层）
 .nojekyll               让 GitHub Pages 原样发布静态文件
 ```
 
@@ -29,7 +31,8 @@ icons/                  应用图标
 
 1. 登录 GitHub → 右上角 `+` → **New repository**。
 2. 仓库名填 `xiaokucun`（随意），可见性选 **Public**（免费 Pages 需要公开仓库），不要勾选初始化 README，点 **Create repository**。
-3. 在新仓库页面点 **uploading an existing file**，把本文件夹里的所有内容（`index.html`、`manifest.webmanifest`、`sw.js`、`icons/`、`.nojekyll`）拖进去，点 **Commit changes**。
+3. 在新仓库页面点 **uploading an existing file**，把本文件夹里的所有内容（`index.html`、`manifest.webmanifest`、`sw.js`、三个 `.png` 图标、`.nojekyll`）拖进去，点 **Commit changes**。
+   > 注意：图标必须与其他文件**放在同一层**（不要建 `icons/` 子文件夹），否则主屏幕图标会显示不出来。
 4. 仓库 **Settings → Pages** → *Build and deployment* → Source 选 **Deploy from a branch**，Branch 选 **main** + **/ (root)**，点 Save。
 5. 等 1 分钟左右，页面顶部会出现网址：`https://<你的用户名>.github.io/xiaokucun/`。
 
