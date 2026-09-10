@@ -211,6 +211,20 @@
   .pick-item .pick-radio.on{border-color:var(--brand);background:var(--brand);box-shadow:inset 0 0 0 3px #fff}
   .pick-new{display:block;width:100%;text-align:center;padding:12px;border:1px dashed var(--brand);border-radius:13px;background:#f0fdfa;color:var(--brand);font-weight:600;cursor:pointer;margin-top:10px}
 
+  /* 分类目录（选择物品） */
+  .catgroup{background:#fff;border-radius:14px;box-shadow:var(--shadow);margin-bottom:8px;overflow:hidden}
+  .catgroup .cathead{display:flex;align-items:center;gap:8px;padding:12px 14px;cursor:pointer}
+  .catgroup .cathead .cname{flex:1;font-size:14px;font-weight:700}
+  .catgroup .cathead .ccount{font-size:11px;color:var(--ink2);background:#f1f5f9;border-radius:8px;padding:2px 7px}
+  .catgroup .cathead .carrow{color:#cbd5e1;font-size:14px;transition:.2s}
+  .catgroup.open .cathead .carrow{transform:rotate(90deg)}
+  .catgroup .catitems{padding:0 10px 10px}
+  .catgroup .catitems .pick-item{margin-bottom:6px;box-shadow:none;background:#f8fafc}
+  #catChips .chip{flex:0 0 auto;min-width:66px;padding:7px 12px}
+  .cattag{font-size:10px;background:#f1f5f9;color:#64748b;border-radius:6px;padding:1px 6px;flex:none}
+  .catrow-line{display:flex;align-items:center;gap:8px}
+  .catrow-line input{flex:1}
+
   /* FAB 动作菜单 */
   .actsheet{padding:16px 16px 6px}
   .actbtn{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px 14px;margin-bottom:10px;cursor:pointer}
@@ -234,18 +248,18 @@
 <body>
 <div id="stage">
 
-  <!-- ============ 物品概览（主页） ============ -->
+  <!-- ============ 库存（只显示有库存的物品） ============ -->
   <section id="view-home" class="view">
     <div class="header">
       <div class="header-top">
         <div>
-          <h1>📦 我的小库存</h1>
-          <div class="sub">档案 + 批次 + 购物篮 · 数据仅存本地</div>
+          <h1>📦 库存</h1>
+          <div class="sub">只显示当前有库存的物品 · 档案请到「档案」查看</div>
         </div>
         <button class="bell" id="bellBtn" title="查看提醒">🔔<span id="bellBadge" class="badge hidden">0</span></button>
       </div>
     </div>
-    <div class="progress-tip hidden" id="demoTip">已载入示例：同名物品（润护乳）有 2 个批次、不同过期时间，展示在同一条档案卡片下。</div>
+    <div class="progress-tip hidden" id="demoTip">已载入示例：库存界面只显示有货物品；「可口可乐」等零库存档案请到「🗂️ 档案」查看，重新录入库存时可在分类目录里选中它。</div>
     <div class="chips" id="chips"></div>
     <div class="toolbar">
       <div class="search">
@@ -262,6 +276,27 @@
       </div>
     </div>
     <div class="list" id="list"></div>
+  </section>
+
+  <!-- ============ 物品档案（分类目录，永久保留） ============ -->
+  <section id="view-archive" class="view hidden">
+    <div class="header">
+      <div class="header-top">
+        <div>
+          <h1>🗂️ 物品档案</h1>
+          <div class="sub">建档一次永久保留 · 库存删空也不会消失</div>
+        </div>
+        <button class="bell" id="catManageBtn" title="管理分类">🏷️</button>
+      </div>
+    </div>
+    <div class="toolbar">
+      <div class="search">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="arcSearch" placeholder="搜索档案名称、备注…" autocomplete="off">
+      </div>
+    </div>
+    <div class="chips" id="catChips" style="flex-wrap:wrap"></div>
+    <div class="list" id="arcList"></div>
   </section>
 
   <!-- ============ 购物篮 ============ -->
@@ -341,7 +376,8 @@
   </div>
 
   <div id="tabbar">
-    <button class="tab on" data-tab="home"><span class="ic">📦</span>物品</button>
+    <button class="tab on" data-tab="home"><span class="ic">📦</span>库存</button>
+    <button class="tab" data-tab="archive"><span class="ic">🗂️</span>档案</button>
     <button class="tab" data-tab="cart"><span class="ic">🛒</span>购物篮<span class="tbadge hidden" id="cartBadge">0</span></button>
     <button class="tab" data-tab="reminders"><span class="ic">🔔</span>提醒</button>
     <button class="tab" data-tab="settings"><span class="ic">⚙️</span>设置</button>
@@ -367,6 +403,13 @@
     <h2 id="masterSheetTitle">新建物品档案</h2>
     <div class="tagline hidden" id="dupWarn">📌 已存在同名档案，保存将直接使用该档案（如需改名请先编辑原档案）。</div>
     <div class="field"><label>物品名称 <span class="req">*</span></label><input id="m_name" maxlength="40" placeholder="例如：润护乳"></div>
+    <div class="field">
+      <label>分类 <span class="opt">(选填，用于录入时的目录)</span></label>
+      <div class="mini-inline">
+        <select id="m_cat"></select>
+      </div>
+      <input id="m_catNew" class="hidden" style="margin-top:8px" maxlength="20" placeholder="输入新分类名称，如：饮料 / 零食">
+    </div>
     <div class="form-grid">
       <div class="field"><label>单位</label><input id="m_unit" list="unitList" placeholder="罐/瓶/包/张/支"></div>
       <div class="field"><label>默认阈值</label><input id="m_threshold" type="number" min="0" step="1" placeholder="低于此值提醒"><div class="hint">不填 = 不监控库存</div></div>
@@ -384,10 +427,27 @@
 <div class="overlay" id="pickerSheet">
   <div class="sheet">
     <button class="close-x" data-close="pickerSheet">✕</button>
-    <h2 id="pickerTitle">选择物品档案</h2>
+    <h2 id="pickerTitle">选择物品（按分类目录）</h2>
     <div class="field pick-search"><input id="pickQuery" placeholder="搜索已建档物品…"></div>
-    <div class="pick-list" id="pickList"></div>
-    <button class="pick-new" id="pickNewBtn">＋ 没有找到？新建物品档案</button>
+    <div class="pick-list" id="catTree"></div>
+    <div class="row-actions" style="margin-top:10px">
+      <button class="btn sm ghost" id="pickNewCatBtn">＋ 新建分类</button>
+      <button class="btn sm" id="pickNewBtn">＋ 新建物品档案</button>
+    </div>
+  </div>
+</div>
+
+<!-- 分类管理 -->
+<div class="overlay" id="catSheet">
+  <div class="sheet">
+    <button class="close-x" data-close="catSheet">✕</button>
+    <h2>管理分类</h2>
+    <div class="tagline">💡 分类只用于「录入库存」时的目录选择；删除分类不会删除物品，物品会回到「未分类」。</div>
+    <div id="catMgmtList"></div>
+    <div class="mini-inline" style="margin-top:12px">
+      <input id="newCatName" maxlength="20" placeholder="新分类名称">
+      <button class="btn sm" id="addCatBtn" style="flex:none">添加</button>
+    </div>
   </div>
 </div>
 
@@ -424,7 +484,7 @@
     <div class="tagline">💡 每行 = 一个批次；同名物品自动归入同一条档案。<b>导入是「合并」，不会清空现有数据</b>（想完全还原请先清空数据再导入）。</div>
     <button class="btn sm ghost" id="csvPickBtn" style="width:100%;margin-bottom:10px">📁 从「文件」选择 CSV 备份文件</button>
     <input type="file" id="csvFile" accept=".csv,text/csv,text/plain" class="hidden">
-    <textarea id="csvText" class="code" placeholder="物品名称,单位,默认阈值,默认补货后数量,物品备注,批次数量,批次过期日期,批次入库日期,批次备注,批次状态"></textarea>
+    <textarea id="csvText" class="code" placeholder="物品名称,物品分类,单位,默认阈值,默认补货后数量,物品备注,批次数量,批次过期日期,批次入库日期,批次备注,批次状态"></textarea>
     <div class="row-actions" style="margin-top:8px">
       <button class="btn sm ghost" id="csvSampleBtn">填入示例</button>
       <button class="btn sm" id="csvImportBtn" style="flex:1">开始导入</button>
@@ -482,7 +542,7 @@ var M = [];   // 物品档案
 var B = [];   // 库存批次
 var cart = []; // 购物篮
 var logs = [];
-var settings = { defUnit:"个", defRefill:5, notify:false, lastCheck:0, lastSent:{} };
+var settings = { defUnit:"个", defRefill:5, notify:false, lastCheck:0, lastSent:{}, cats:[] };
 
 function load(){
   try{ M = JSON.parse(localStorage.getItem(LS_M)) || []; }catch(e){ M=[]; }
@@ -495,7 +555,9 @@ function load(){
     l.read = false;
     return l;
   });
-  try{ settings = Object.assign({ defUnit:"个", defRefill:5, notify:false, lastCheck:0, lastSent:{} }, JSON.parse(localStorage.getItem(LS_SET)) || {}); }catch(e){}
+  try{ settings = Object.assign({ defUnit:"个", defRefill:5, notify:false, lastCheck:0, lastSent:{}, cats:[] }, JSON.parse(localStorage.getItem(LS_SET)) || {}); }catch(e){}
+  if (!Array.isArray(settings.cats)) settings.cats = [];
+  M.forEach(function(m){ if (!m.cat) m.cat = "未分类"; });
   if (M.length === 0){
     // 从 V1 单条模型迁移：同名合并为一个档案下的多个批次
     var v1 = null;
@@ -524,6 +586,25 @@ function saveCart(){ localStorage.setItem(LS_CART, JSON.stringify(cart)); }
 function saveState(){ localStorage.setItem(LS_HIST, JSON.stringify(logs)); localStorage.setItem(LS_SET, JSON.stringify(settings)); }
 
 /* ---------- 模型查询 ---------- */
+function defaultCat(){ return "未分类"; }
+function catOf(m){ return (m && m.cat) ? m.cat : defaultCat(); }
+function catsUsed(){
+  var set = {};
+  (settings.cats || []).forEach(function(c){ if (c && c !== defaultCat()) set[c] = 1; });
+  M.forEach(function(m){ var c = catOf(m); if (c !== defaultCat()) set[c] = 1; });
+  return Object.keys(set);
+}
+function catOptions(){ return [defaultCat()].concat(catsUsed()); }
+function ensureCat(name){
+  var c = String(name || "").trim();
+  if (!c || c === defaultCat()) return defaultCat();
+  if (catsUsed().indexOf(c) < 0){ settings.cats.push(c); saveState(); }
+  return c;
+}
+function catCount(name){
+  return M.filter(function(m){ return catOf(m) === name; }).length;
+}
+function stockMasters(){ return M.filter(function(m){ return totalStock(m) > 0; }); }
 function masterById(id){ for (var i=0;i<M.length;i++) if (M[i].id===id) return M[i]; return null; }
 function masterByName(name){ var k=norm(name); if(!k) return null; for (var i=0;i<M.length;i++) if (norm(M[i].name)===k) return M[i]; return null; }
 function batchesOf(mid, activeOnly){
@@ -687,7 +768,8 @@ function purgeMasterLogs(m){
    UI 状态
    ============================================================ */
 var UI = { tab:"home", filter:"all", sort:"urgency", search:"", detailId:null,
-  masterMode:"new", pickTarget:null, pickQuery:"", sel:new Set(), batchEditId:null, batchItemId:null };
+  masterMode:"new", pickTarget:null, pickQuery:"", sel:new Set(), batchEditId:null, batchItemId:null,
+  catFilter:"all", arcSearch:"", openCats:{}, openCatsInit:false, presetCat:null };
 
 /* ---------- Toast ---------- */
 function toast(html, type, itemId){
@@ -729,8 +811,9 @@ function confirmBox(icon, title, text, yesText, action){
    主页：物品概览
    ============================================================ */
 function itemCounts(){
-  var c = { all:M.length, low:0, soon:0, expired:0 };
-  M.forEach(function(m){
+  var inStock = stockMasters();
+  var c = { all:inStock.length, low:0, soon:0, expired:0 };
+  inStock.forEach(function(m){
     var a = masterAlert(m);
     if (a.code==="low") c.low++;
     if (a.code==="urgent" || a.code==="soon") c.soon++;
@@ -739,7 +822,7 @@ function itemCounts(){
   return c;
 }
 function filteredMasters(){
-  var arr = M.slice();
+  var arr = stockMasters();
   if (UI.search){
     var kw = norm(UI.search);
     arr = arr.filter(function(m){ return norm(m.name).indexOf(kw) >= 0 || norm(m.note).indexOf(kw) >= 0; });
@@ -795,8 +878,8 @@ function renderHome(){
   renderChips();
   var box = $("#list");
   if (M.length === 0){
-    box.innerHTML = '<div class="empty"><div class="big">📦</div><p>还没有物品档案</p>' +
-      '<p style="font-size:12px">点右下角「＋」新建档案，或到设置里载入示例数据。</p>' +
+    box.innerHTML = '<div class="empty"><div class="big">🗂️</div><p>还没有任何物品档案</p>' +
+      '<p style="font-size:12px">先到「档案」建档，再回来录入库存。</p>' +
       '<button class="btn" id="emptyAdd">＋ 新建物品档案</button></div>';
     var b = $("#emptyAdd");
     if (b) b.addEventListener("click", function(){ openMasterSheet(); });
@@ -804,7 +887,14 @@ function renderHome(){
   }
   var arr = filteredMasters();
   if (arr.length === 0){
-    box.innerHTML = '<div class="empty"><div class="big">🔍</div><p>没有符合条件的物品</p></div>';
+    var noStock = stockMasters().length === 0;
+    box.innerHTML = '<div class="empty"><div class="big">📦</div><p>' + (noStock ? "当前没有在库物品" : "没有符合筛选条件的物品") + '</p>' +
+      '<p style="font-size:12px">' + (noStock
+        ? "档案里的物品都还保留着；到「🗂️ 档案」选中某件物品即可重新录入库存。"
+        : "换个筛选条件看看，或去「🗂️ 档案」查看全部档案。") + '</p>' +
+      '<button class="btn" id="emptyToArc">去档案看看</button></div>';
+    var b2 = $("#emptyToArc");
+    if (b2) b2.addEventListener("click", function(){ switchTab("archive"); });
     return;
   }
   box.innerHTML = arr.map(function(m){
@@ -840,6 +930,75 @@ function renderHome(){
   updateFab();
 }
 
+/* ---------- 物品档案（分类目录，永久保留） ---------- */
+function archiveAlert(m){
+  if (totalStock(m) === 0) return { tag:"缺货", cls:"b-low" };
+  var a = masterAlert(m);
+  return { tag:a.tag, cls:a.cls };
+}
+function renderCatChips(){
+  var defs = [{ k:"all", label:"全部", n:M.length }];
+  defs.push({ k:defaultCat(), label:defaultCat(), n:catCount(defaultCat()) });
+  catsUsed().forEach(function(c){ defs.push({ k:c, label:c, n:catCount(c) }); });
+  $("#catChips").innerHTML = defs.map(function(d){
+    return '<div class="chip c-all' + (UI.catFilter===d.k ? " on":"") + '" data-cat="' + esc(d.k) + '">' +
+      '<div class="n">' + d.n + '</div><div class="t">' + esc(d.label) + '</div></div>';
+  }).join("");
+}
+function filteredArchive(){
+  var arr = M.slice();
+  if (UI.catFilter !== "all"){
+    arr = arr.filter(function(m){ return catOf(m) === UI.catFilter; });
+  }
+  if (UI.arcSearch){
+    var kw = norm(UI.arcSearch);
+    arr = arr.filter(function(m){ return norm(m.name).indexOf(kw) >= 0 || norm(m.note).indexOf(kw) >= 0; });
+  }
+  arr.sort(function(a,b){
+    var ca = catOf(a), cb = catOf(b);
+    if (ca !== cb) return ca < cb ? -1 : 1;
+    return a.name < b.name ? -1 : (a.name > b.name ? 1 : 0);
+  });
+  return arr;
+}
+function renderArchive(){
+  renderCatChips();
+  var box = $("#arcList");
+  if (M.length === 0){
+    box.innerHTML = '<div class="empty"><div class="big">🗂️</div><p>还没有物品档案</p>' +
+      '<p style="font-size:12px">建档一次永久保留：即使库存删空，下次录入时仍可在这里（或其分类下）找到它。</p>' +
+      '<button class="btn" id="arcEmptyAdd">＋ 新建物品档案</button></div>';
+    var b = $("#arcEmptyAdd");
+    if (b) b.addEventListener("click", function(){ openMasterSheet(); });
+    return;
+  }
+  var arr = filteredArchive();
+  if (!arr.length){
+    box.innerHTML = '<div class="empty"><div class="big">🔍</div><p>没有符合条件的档案</p></div>';
+    return;
+  }
+  box.innerHTML = arr.map(function(m){
+    var a = archiveAlert(m);
+    var t = totalStock(m);
+    var th = getTh(m);
+    return '<div class="card ' + a.cls + '" data-arc="' + esc(m.id) + '">' +
+      '<div class="body">' +
+        '<div class="top"><span class="name"><span class="nm">' + esc(m.name) + '</span>' +
+          (m.unit ? '<span class="unit-tag">' + esc(m.unit) + '</span>' : "") +
+          '<span class="cattag">' + esc(catOf(m)) + '</span></span>' +
+          '<span class="tag">' + a.tag + '</span></div>' +
+        '<div class="meta"><span class="qty"><b>' + t + '</b> ' + esc(m.unit||"个") + '</span>' +
+          (th !== null ? '<span class="qty" style="font-size:11px;color:#94a3b8">阈值 ' + th + '</span>' : "") +
+          '<span class="brow-count">' + activeCount(m) + ' 个在库批次</span></div>' +
+        (m.note ? '<div class="cnote">📝 ' + esc(m.note) + '</div>' : "") +
+      '</div>' +
+      '<div class="actions">' +
+        '<button class="icon-btn restock" data-arcadd="' + esc(m.id) + '" title="录入库存">＋</button>' +
+      '</div></div>';
+  }).join("");
+  updateFab();
+}
+
 /* ---------- 批量删除 ---------- */
 function enterSel(){ UI.selMode = true; UI.sel.clear(); updateFab(); renderHome(); }
 function exitSel(){ UI.selMode = false; UI.sel.clear(); updateFab(); renderHome(); }
@@ -861,8 +1020,9 @@ function delSel(){
 }
 
 function updateFab(){
-  $("#fabAdd").classList.toggle("hidden", !!UI.selMode || UI.tab!=="home");
-  $("#fabwrap").style.display = (UI.selMode || UI.tab!=="home") ? "none" : "";
+  var inListView = (UI.tab === "home" || UI.tab === "archive");
+  $("#fabAdd").classList.toggle("hidden", !!UI.selMode || !inListView);
+  $("#fabwrap").style.display = (UI.selMode || !inListView) ? "none" : "";
   $("#multiBar").classList.toggle("hidden", !UI.selMode);
   $("#selCount").textContent = UI.sel.size;
 }
@@ -890,10 +1050,20 @@ function openMasterSheet(m, quickTarget){
   $("#m_threshold").value = m ? (hasThreshold(m) ? m.threshold : "") : "";
   $("#m_refill").value = m ? (m.refillQty||settings.defRefill) : settings.defRefill;
   $("#m_note").value = m ? (m.note||"") : "";
+  renderCatSelect(m ? catOf(m) : (UI.presetCat || defaultCat()));
+  $("#m_catNew").value = "";
+  $("#m_catNew").classList.add("hidden");
   var warn = $("#dupWarn");
   if (!m && quickTarget) { warn.classList.remove("hidden"); } else { warn.classList.add("hidden"); }
   openSheet("masterSheet");
   setTimeout(function(){ $("#m_name").focus(); }, 100);
+}
+function renderCatSelect(selected){
+  var opts = catOptions();
+  if (selected && opts.indexOf(selected) < 0) opts.push(selected);
+  $("#m_cat").innerHTML = opts.map(function(c){
+    return '<option value="' + esc(c) + '"' + (c===selected ? " selected":"") + '>' + esc(c) + '</option>';
+  }).join("") + '<option value="__new__">＋ 新建分类…</option>';
 }
 function saveMaster(){
   var name = $("#m_name").value.trim();
@@ -904,6 +1074,12 @@ function saveMaster(){
   var refill = parseInt($("#m_refill").value,10);
   var refillQty = (!isNaN(refill) && refill>0) ? refill : (settings.defRefill||5);
   var note = $("#m_note").value.trim();
+  var catPick = $("#m_cat").value;
+  var cat = catPick === "__new__" ? ensureCat($("#m_catNew").value) : catPick;
+  if (catPick === "__new__" && cat === defaultCat() && !$("#m_catNew").value.trim()){
+    toast("请填写新分类名称，或选择已有分类");
+    return;
+  }
   if (UI.masterMode === "edit"){
     var m0 = masterById(UI.detailId);
     var m = m0;
@@ -911,7 +1087,7 @@ function saveMaster(){
     if (m){
       var dup = masterByName(name);
       if (dup && dup.id !== m.id){ toast("已存在同名档案「" + dup.name + "」，不能重名"); return; }
-      m.name = name; m.unit = unit; m.threshold = threshold; m.refillQty = refillQty; m.note = note;
+      m.name = name; m.unit = unit; m.threshold = threshold; m.refillQty = refillQty; m.note = note; m.cat = cat;
       saveM();
   closeSheet("masterSheet");
   renderAll();
@@ -929,11 +1105,12 @@ function saveMaster(){
     if (existing.threshold===null && threshold!==null) existing.threshold = threshold;
     if (!existing.note && note) existing.note = note;
     if (unit && unit!=="个" && !existing.unit) existing.unit = unit;
+    if ((!existing.cat || existing.cat===defaultCat()) && cat && cat!==defaultCat()) existing.cat = cat;
     saveM();
     created = existing;
     toast("已并入现有档案「" + existing.name + "」");
   } else {
-    created = { id:uid(), name:name, unit:unit, threshold:threshold, refillQty:refillQty, note:note, createdAt:Date.now() };
+    created = { id:uid(), name:name, unit:unit, threshold:threshold, refillQty:refillQty, note:note, cat:cat, createdAt:Date.now() };
     M.unshift(created);
     saveM();
     toast("档案「" + name + "」已创建 ✓");
@@ -954,8 +1131,10 @@ function saveMaster(){
 function openPicker(target){
   UI.pickTarget = target;
   UI.pickQuery = "";
+  UI.openCats = {};
+  UI.openCatsInit = false;
   $("#pickQuery").value = "";
-  $("#pickerTitle").textContent = target==="cart" ? "选择物品（加入购物篮）" : "选择物品档案";
+  $("#pickerTitle").textContent = target==="cart" ? "选择物品（加入购物篮）" : "选择物品（按分类目录）";
   renderPicker();
   openSheet("pickerSheet");
 }
@@ -963,23 +1142,102 @@ function renderPicker(){
   var kw = norm(UI.pickQuery);
   var arr = M.slice();
   if (kw) arr = arr.filter(function(m){ return norm(m.name).indexOf(kw)>=0; });
-  arr.sort(function(a,b){ return a.name < b.name ? -1 : 1; });
-  var box = $("#pickList");
+  var box = $("#catTree");
   if (!arr.length){
-    box.innerHTML = '<div class="empty" style="padding:24px"><div class="big">🗂️</div><p>没有找到物品</p></div>';
+    box.innerHTML = '<div class="empty" style="padding:24px"><div class="big">🗂️</div><p>' +
+      (M.length ? "没有匹配的物品档案" : "还没有物品档案") + '</p>' +
+      '<p style="font-size:12px">' + (M.length ? "换个关键词试试" : "先「＋ 新建物品档案」，之后随时能在分类里选中它") + '</p></div>';
     return;
   }
-  box.innerHTML = arr.map(function(m){
+  function pickRow(m){
     var t = totalStock(m), ac = activeCount(m);
     return '<div class="pick-item" data-pick="' + esc(m.id) + '">' +
-      '<div class="pn"><b>' + esc(m.name) + (m.unit? ' <span class="unit-tag">'+esc(m.unit)+'</span>' : "") + '</b>' +
+      '<div class="pn"><b>' + esc(m.name) + (m.unit? ' <span class="unit-tag">'+esc(m.unit)+'</span>' : "") +
+        (t === 0 ? ' <span class="cattag" style="background:#fef3c7;color:#92400e">缺货</span>' : '') + '</b>' +
       '<span>在库 ' + t + ' · ' + ac + ' 个批次</span></div>' +
       '<span class="arrow" style="color:#cbd5e1">›</span></div>';
+  }
+  if (kw){
+    box.innerHTML = '<div class="sec-title" style="padding:2px 2px 8px">搜索结果（' + arr.length + '）</div>' + arr.map(pickRow).join("");
+    return;
+  }
+  var groups = [defaultCat()].concat(catsUsed());
+  var items = groups.map(function(c){
+    return { cat:c, list: arr.filter(function(m){ return catOf(m) === c; }).sort(function(a,b){ return a.name < b.name ? -1 : 1; }) };
+  }).filter(function(g){ return g.list.length; });
+  if (!UI.openCatsInit){
+    var total = arr.length;
+    groups.forEach(function(c){ UI.openCats[c] = (total <= 12) || (c === defaultCat() && total <= 20); });
+    UI.openCatsInit = true;
+  }
+  box.innerHTML = items.map(function(g){
+    var open = !!UI.openCats[g.cat];
+    return '<div class="catgroup' + (open ? " open":"") + '" data-catgroup="' + esc(g.cat) + '">' +
+      '<div class="cathead" data-cattoggle="' + esc(g.cat) + '">' +
+        '<span class="cname">' + esc(g.cat) + '</span>' +
+        '<span class="ccount">' + g.list.length + ' 项</span>' +
+        '<span class="carrow">›</span></div>' +
+      (open ? '<div class="catitems">' + g.list.map(pickRow).join("") + '</div>' : "") +
+      '</div>';
   }).join("");
 }
 function afterPick(m, target){
   if (target === "batch") openBatchSheet(m);
   else if (target === "cart") openCartLine(m);
+}
+
+/* ---------- 分类管理 ---------- */
+function renderCatMgmt(){
+  var used = catsUsed();
+  var box = $("#catMgmtList");
+  if (!used.length){
+    box.innerHTML = '<div class="empty" style="padding:20px"><p>还没有自建分类</p>' +
+      '<p style="font-size:12px">在下面输入名称即可创建，例如：饮料、零食、护肤</p></div>';
+    return;
+  }
+  box.innerHTML = used.map(function(c){
+    return '<div class="catrow-line" style="margin-bottom:8px" data-catrow="' + esc(c) + '">' +
+      '<input value="' + esc(c) + '" maxlength="20" data-catinput="' + esc(c) + '">' +
+      '<button class="mini green" data-catact="rename" data-cat="' + esc(c) + '">保存</button>' +
+      '<button class="mini del" data-catact="del" data-cat="' + esc(c) + '">删除</button>' +
+      '</div>';
+  }).join("") + '<div class="subtle" style="margin-top:6px">共 ' + used.length + ' 个分类 · 「未分类」始终存在</div>';
+}
+function addCategory(){
+  var v = $("#newCatName").value.trim();
+  if (!v){ toast("请输入分类名称"); return; }
+  if (v === defaultCat() || catsUsed().indexOf(v) >= 0){ toast("该分类已存在"); return; }
+  settings.cats.push(v);
+  saveState();
+  $("#newCatName").value = "";
+  renderCatMgmt();
+  renderArchive();
+  toast("已创建分类「" + v + "」✓");
+}
+function renameCategory(oldName, newName){
+  var v = String(newName || "").trim();
+  if (!v){ toast("分类名不能为空"); return; }
+  if (v === oldName) return;
+  if (v === defaultCat() || catsUsed().indexOf(v) >= 0){ toast("已存在同名分类"); return; }
+  settings.cats = settings.cats.map(function(c){ return c === oldName ? v : c; });
+  M.forEach(function(m){ if (catOf(m) === oldName) m.cat = v; });
+  saveAll();
+  renderCatMgmt(); renderArchive(); renderHome(); renderPicker();
+  toast("分类已重命名为「" + v + "」");
+}
+function deleteCategory(name){
+  var n = catCount(name);
+  confirmBox("🏷️", "删除分类「" + name + "」？", n
+    ? "该分类下的 " + n + " 个物品档案不会被删除，会移动回「未分类」。"
+    : "该分类下没有物品档案。", "删除",
+    function(){
+      settings.cats = settings.cats.filter(function(c){ return c !== name; });
+      M.forEach(function(m){ if (catOf(m) === name) m.cat = defaultCat(); });
+      if (UI.catFilter === name) UI.catFilter = "all";
+      saveAll();
+      renderCatMgmt(); renderArchive(); renderHome(); renderPicker();
+      toast("分类已删除，物品已归入「未分类」");
+    });
 }
 
 /* ============================================================
@@ -1153,9 +1411,8 @@ function renderDetail(){
   var html = '<div class="detail-head">' +
     '<button class="back-btn" id="detailBack">‹</button>' +
     '<div class="dt"><h2>' + esc(m.name) + (m.unit?'（'+esc(m.unit)+'）':'') + '</h2>' +
-    '<p>' + (m.note ? esc(m.note) : "批次按过期日期从近到远排列，优先使用最上面一批") + '</p></div>' +
-    '<button class="dbtn" id="dEditMaster">编辑</button>' +
-    '<button class="dbtn" id="dDelMaster">删除</button></div>';
+    '<p>分类：' + esc(catOf(m)) + (m.note ? " · " + esc(m.note) : " · 批次按过期日期从近到远排列") + '</p></div>' +
+    '<button class="dbtn" id="dEditMaster">编辑</button></div>';
   html += '<div style="padding:0 20px">';
   html += '<div class="statbox">' +
     '<div class="stat"><b>' + t + '</b><span>在库总量(' + esc(m.unit||"个") + ')</span></div>' +
@@ -1169,12 +1426,29 @@ function renderDetail(){
     html += '<div class="batch-group-title"><span>历史（已用完 / 已清理）</span></div>';
     hist.forEach(function(b){ html += batchRowHtml(m, b, true); });
   }
-  html += '<button class="addbatch" id="dAddBatch">＋ 为该档案新增一批</button></div>';
+  html += '<button class="addbatch" id="dAddBatch">＋ 为该档案新增一批</button>';
+  html += '<div class="dl-row" style="margin-top:10px">' +
+    '<button class="btn sm warn" id="dClearStock">清空库存</button>' +
+    '<button class="btn sm danger" id="dDelMaster">删除档案</button></div>' +
+    '<div class="subtle" style="margin:8px 2px 0">「清空库存」只删除批次，档案保留；「删除档案」会连同批次一起删除。</div></div>';
   $("#detailInner").innerHTML = html;
   $("#detailBack").addEventListener("click", function(){ closeSheet("detailSheet"); });
   $("#dEditMaster").addEventListener("click", function(){
     UI.detailId = m.id;
     openMasterSheet(m);
+  });
+  $("#dClearStock").addEventListener("click", function(){
+    var n = B.filter(function(b){ return b.itemId===m.id; }).length;
+    if (!n){ toast("该档案目前没有库存记录"); return; }
+    confirmBox("📦", "清空「" + m.name + "」的库存？", "将删除 " + n + " 条批次记录（含历史）。物品档案会保留，下次仍可在分类目录中找到它。", "清空库存",
+      function(){
+        B = B.filter(function(b){ return b.itemId!==m.id; });
+        saveB();
+        resolveAlerts();
+        renderAll();
+        if ($("#detailSheet").classList.contains("open")) renderDetail();
+        toast("已清空库存，档案「" + m.name + "」仍保留 ✓");
+      });
   });
   $("#dDelMaster").addEventListener("click", function(){
     var n = B.filter(function(b){ return b.itemId===m.id; }).length;
@@ -1327,7 +1601,9 @@ function renderReminders(){
 /* ============================================================
    CSV 导入导出
    ============================================================ */
-var CSV_HEAD = ["物品名称","单位","默认阈值","默认补货后数量","物品备注","批次数量","批次过期日期","批次入库日期","批次备注","批次状态"];
+var CSV_HEAD = ["物品名称","物品分类","单位","默认阈值","默认补货后数量","物品备注","批次数量","批次过期日期","批次入库日期","批次备注","批次状态"];
+var CSV_POS = { "物品名称":0, "物品分类":1, "单位":2, "默认阈值":3, "默认补货后数量":4, "物品备注":5,
+  "批次数量":6, "批次过期日期":7, "批次入库日期":8, "批次备注":9, "批次状态":10 };
 function splitCSVLine(line){
   var out=[], cur="", q=false;
   for (var i=0;i<line.length;i++){
@@ -1344,10 +1620,10 @@ function exportCSV(){
   M.forEach(function(m){
     var bs = B.filter(function(b){ return b.itemId===m.id; });
     if (!bs.length){
-      rows.push([m.name, m.unit||"", hasThreshold(m)?m.threshold:"", m.refillQty||"", m.note||"", "", "", "", "", ""]);
+      rows.push([m.name, catOf(m), m.unit||"", hasThreshold(m)?m.threshold:"", m.refillQty||"", m.note||"", "", "", "", "", ""]);
     }
     bs.forEach(function(b){
-      rows.push([m.name, m.unit||"", hasThreshold(m)?m.threshold:"", m.refillQty||"", m.note||"", b.qty, b.expiry||"", b.inDate||"", b.note||"", stName(b)]);
+      rows.push([m.name, catOf(m), m.unit||"", hasThreshold(m)?m.threshold:"", m.refillQty||"", m.note||"", b.qty, b.expiry||"", b.inDate||"", b.note||"", stName(b)]);
     });
   });
   var csv = "\uFEFF" + [CSV_HEAD.join(",")].concat(rows.map(function(r){
@@ -1404,28 +1680,35 @@ function parseImport(text){
     });
     start = 1;
   }
-  var g = function(c,k){ return map ? (c[map[k]]==null?"":String(c[map[k]]).trim()) : ""; };
+  var g = function(c,k){
+    var i = map ? map[k] : CSV_POS[k];
+    if (i === undefined || i === null) return "";
+    return c[i] == null ? "" : String(c[i]).trim();
+  };
   var addedM = 0, addedB = 0, skipped = [];
   for (var i=start;i<lines.length;i++){
     var c = splitCSVLine(lines[i]);
-    var name = map ? g(c,"物品名称") : (c[0]||"").trim();
+    var name = g(c,"物品名称");
     if (!name){ skipped.push("第 " + (i+1) + " 行缺名称"); continue; }
+    var catTxt = g(c,"物品分类");
     var m = masterByName(name);
     var isNew = false;
     if (!m){
-      m = { id:uid(), name:name, unit: (map?g(c,"单位"):(c[1]||"")).trim() || settings.defUnit||"个",
-        threshold: (map?g(c,"默认阈值"):(c[2]||"")).trim()===""? null : Math.max(0,parseInt(map?g(c,"默认阈值"):c[2],10)||0),
-        refillQty: parseInt(map?g(c,"默认补货后数量"):c[4],10) || settings.defRefill||5,
-        note: map?g(c,"物品备注"):"", createdAt:Date.now() };
+      m = { id:uid(), name:name, unit: g(c,"单位") || settings.defUnit||"个",
+        threshold: g(c,"默认阈值")===""? null : Math.max(0, parseInt(g(c,"默认阈值"),10)||0),
+        refillQty: parseInt(g(c,"默认补货后数量"),10) || settings.defRefill||5,
+        note: g(c,"物品备注"), cat: ensureCat(catTxt), createdAt:Date.now() };
       M.unshift(m);
       addedM++;
       isNew = true;
+    } else if (catTxt && (!m.cat || m.cat === defaultCat())){
+      m.cat = ensureCat(catTxt);
     }
-    var qtyTxt = map ? g(c,"批次数量") : "";
-    var expiryTxt = map ? g(c,"批次过期日期") : "";
-    var inTxt = map ? g(c,"批次入库日期") : "";
-    var noteTxt = map ? g(c,"批次备注") : "";
-    var stTxt = map ? g(c,"批次状态") : "";
+    var qtyTxt = g(c,"批次数量");
+    var expiryTxt = g(c,"批次过期日期");
+    var inTxt = g(c,"批次入库日期");
+    var noteTxt = g(c,"批次备注");
+    var stTxt = g(c,"批次状态");
     var hasBatch = qtyTxt!=="" || expiryTxt!=="" || noteTxt!=="" || stTxt!=="";
     if (!hasBatch && isNew){ addedM++; continue; }
     var qty = qtyTxt==="" ? 1 : parseInt(qtyTxt,10);
@@ -1444,16 +1727,18 @@ function parseImport(text){
    示例数据
    ============================================================ */
 function seedDemo(){
-  function mm(name,unit,th,rf,note){ return { id:uid(), name:name, unit:unit, threshold:th, refillQty:rf, note:note, createdAt:Date.now() }; }
+  function mm(name,unit,th,rf,note,cat){ return { id:uid(), name:name, unit:unit, threshold:th, refillQty:rf, note:note, cat:cat||defaultCat(), createdAt:Date.now() }; }
   function bb(itemId,qty,expiry,note,st){ st = st || "a"; var o = { id:uid(), itemId:itemId, qty:qty, expiry:expiry||null, note:note||"", inDate:todayKey(), st:st, createdAt:Date.now() }; if(st==="g") o.goneK="expired"; return o; }
-  var m1 = mm("润护乳","罐",1,3,"保湿身体乳 · 一支自用一支囤货");
-  var m2 = mm("MAC定妆喷雾","瓶",2,5,"丝芙兰购入");
-  var m3 = mm("兰蔻粉底液","瓶",1,2,"已开封，注意先使用");
-  var m4 = mm("珂润面霜","罐",1,2,"秋冬款");
-  var m5 = mm("过期小样身体乳","支",null,5,"清理库存用");
-  var m6 = mm("凡士林润唇膏","支",1,3,"办公室/床头各一支");
-  var m7 = mm("全棉时代洗脸巾","包",3,10,"京东囤货");
-  M = [m1,m2,m3,m4,m5,m6,m7];
+  var m1 = mm("润护乳","罐",1,3,"保湿身体乳 · 一支自用一支囤货","护肤");
+  var m2 = mm("MAC定妆喷雾","瓶",2,5,"丝芙兰购入","护肤");
+  var m3 = mm("兰蔻粉底液","瓶",1,2,"已开封，注意先使用","护肤");
+  var m4 = mm("珂润面霜","罐",1,2,"秋冬款","护肤");
+  var m5 = mm("过期小样身体乳","支",null,5,"清理库存用","护肤");
+  var m6 = mm("凡士林润唇膏","支",1,3,"办公室/床头各一支","日用");
+  var m7 = mm("全棉时代洗脸巾","包",3,10,"京东囤货","日用");
+  var m8 = mm("可口可乐","罐",1,6,"零库存演示：档案保留，重新录入时可在「食品」目录里选中","食品");
+  var m9 = mm("抽纸","包",2,8,"日常囤货","日用");
+  M = [m1,m2,m3,m4,m5,m6,m7,m8,m9];
   B = [
     bb(m1.id,1,addDays(12),"2026-09 超市购入"),
     bb(m1.id,1,addDays(150),"2026-08 线上囤货"),
@@ -1465,7 +1750,9 @@ function seedDemo(){
     bb(m5.id,2,addDays(-12),""),
     bb(m6.id,0,null,"", "u"),
     bb(m7.id,8,null,""),
+    bb(m9.id,6,null,""),
   ];
+  settings.cats = ["护肤","日用","食品"];
   logs = [];
   settings.lastSent = {};
   saveState();
@@ -1478,7 +1765,7 @@ function seedDemo(){
 function switchTab(name){
   UI.tab = name;
   UI.selMode = false; UI.sel.clear();
-  var views = { home:"view-home", cart:"view-cart", reminders:"view-reminders", settings:"view-settings" };
+  var views = { home:"view-home", archive:"view-archive", cart:"view-cart", reminders:"view-reminders", settings:"view-settings" };
   Object.keys(views).forEach(function(k){
     $("#" + views[k]).classList.toggle("hidden", k !== name);
   });
@@ -1486,10 +1773,11 @@ function switchTab(name){
   updateFab(); updateCartBadge();
   if (name === "reminders") renderReminders();
   if (name === "home") renderHome();
+  if (name === "archive") renderArchive();
   if (name === "cart") renderCart();
 }
 function renderAll(){
-  renderHome(); renderReminders(); renderCart();
+  renderHome(); renderArchive(); renderReminders(); renderCart();
   updateBell(); updateCartBadge(); updateExportSub();
 }
 
@@ -1565,10 +1853,22 @@ function bind(){
 
   /* 档案 */
   $("#m_save").addEventListener("click", saveMaster);
+  $("#m_cat").addEventListener("change", function(e){
+    var isNew = e.target.value === "__new__";
+    $("#m_catNew").classList.toggle("hidden", !isNew);
+    if (isNew) $("#m_catNew").focus();
+  });
 
   /* 选择物品 */
   $("#pickQuery").addEventListener("input", function(e){ UI.pickQuery = e.target.value; renderPicker(); });
-  $("#pickList").addEventListener("click", function(e){
+  $("#catTree").addEventListener("click", function(e){
+    var tg = e.target.closest("[data-cattoggle]");
+    if (tg){
+      var c = tg.dataset.cattoggle;
+      UI.openCats[c] = !UI.openCats[c];
+      renderPicker();
+      return;
+    }
     var p = e.target.closest(".pick-item");
     if (!p) return;
     var m = masterById(p.dataset.pick);
@@ -1579,6 +1879,40 @@ function bind(){
   $("#pickNewBtn").addEventListener("click", function(){
     closeSheet("pickerSheet");
     openMasterSheet(null, UI.pickTarget);
+  });
+  $("#pickNewCatBtn").addEventListener("click", function(){ renderCatMgmt(); openSheet("catSheet"); });
+  $("#catManageBtn").addEventListener("click", function(){ renderCatMgmt(); openSheet("catSheet"); });
+  $("#addCatBtn").addEventListener("click", addCategory);
+  $("#newCatName").addEventListener("keydown", function(e){ if (e.key === "Enter") addCategory(); });
+  $("#catMgmtList").addEventListener("click", function(e){
+    var btn = e.target.closest("[data-catact]");
+    if (!btn) return;
+    var name = btn.dataset.cat;
+    if (btn.dataset.catact === "del"){ deleteCategory(name); return; }
+    var inputs = document.querySelectorAll("#catMgmtList [data-catinput]");
+    for (var i=0;i<inputs.length;i++){
+      if (inputs[i].dataset.catinput === name){ renameCategory(name, inputs[i].value); return; }
+    }
+  });
+
+  /* 档案视图 */
+  $("#arcSearch").addEventListener("input", function(e){ UI.arcSearch = e.target.value.trim(); renderArchive(); });
+  $("#catChips").addEventListener("click", function(e){
+    var c = e.target.closest(".chip");
+    if (!c) return;
+    UI.catFilter = c.dataset.cat;
+    renderArchive();
+  });
+  $("#arcList").addEventListener("click", function(e){
+    var add = e.target.closest("[data-arcadd]");
+    if (add){
+      var mm = masterById(add.dataset.arcadd);
+      if (mm) openBatchSheet(mm, null, false);
+      return;
+    }
+    var card = e.target.closest("[data-arc]");
+    if (!card) return;
+    openDetail(card.dataset.arc);
   });
 
   /* 批次 */
@@ -1670,9 +2004,9 @@ function bind(){
   });
   $("#csvSampleBtn").addEventListener("click", function(){
     $("#csvText").value = CSV_HEAD.join(",") + "\n" +
-      "防晒霜,瓶,1,3,夏天通勤用,2,2027-06-01,,屈臣氏购入,使用中\n" +
-      "防晒霜,瓶,1,3,夏天通勤用,1,2027-09-01,,天猫囤货,使用中\n" +
-      "手机膜,张,5,10,淘宝囤的,10,,,,";
+      "防晒霜,护肤,瓶,1,3,夏天通勤用,2,2027-06-01,,屈臣氏购入,使用中\n" +
+      "防晒霜,护肤,瓶,1,3,夏天通勤用,1,2027-09-01,,天猫囤货,使用中\n" +
+      "手机膜,数码,张,5,10,淘宝囤的,10,,,,";
   });
   $("#csvImportBtn").addEventListener("click", function(){
     var r = parseImport($("#csvText").value);
